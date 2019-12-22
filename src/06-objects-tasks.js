@@ -113,51 +113,71 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
-  elements: {},
+  elements: {
+    id: 0,
+    psEl: 0,
+  },
+  elementOrder: ['element', 'id ', 'class', 'attribute', 'pseudo-class', 'pseudo-element'],
+  currentElementOrder: [],
   combineResult: [],
   result: [],
   element(value) {
     if (this.result.length > 0) {
-      // if (this.result.length < 2) throw Error;
+      if (this.result.length < 2) { this.sendError(); }
       this.combineResult.push(this.result.join(''));
       this.result = [];
       this.elements = {};
+      this.currentElementOrder = [];
     }
+
+    this.checkOrder(this.elementOrder[0]);
 
     this.result.push(value);
     return this;
   },
 
   id(value) {
-    // if (this.element.id) {
-    //   throw Error;
-    // }
-    // this.element.id = 1;
+    if (this.elements.id) {
+      this.sendError();
+    }
+    this.elements.id = 1;
+
+    this.checkOrder(this.elementOrder[1]);
+
+
     this.result.push(`#${value}`);
     return this;
   },
 
   class(value) {
+    this.checkOrder(this.elementOrder[2]);
+
     this.result.push(`.${value}`);
     return this;
   },
 
   attr(value) {
+    this.checkOrder(this.elementOrder[3]);
+
     this.result.push(`[${value}]`);
     return this;
   },
 
   pseudoClass(value) {
-    this.element.psCls = 1;
+    this.checkOrder(this.elementOrder[4]);
+
     this.result.push(`:${value}`);
     return this;
   },
 
   pseudoElement(value) {
-    // if (this.element.psEl) {
-    //   throw Error;
-    // }
-    // this.element.psEl = 1;
+    if (this.elements.psEl) {
+      this.sendError();
+    }
+    this.elements.psEl = 1;
+
+    this.checkOrder(this.elementOrder[5]);
+
     this.result.push(`::${value}`);
     return this;
   },
@@ -170,11 +190,31 @@ const cssSelectorBuilder = {
     return this;
   },
 
-  stringify() {
-    const resultEnd = this.result.join('');
+  sendError() {
+    this.clean();
+    throw Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+  },
+
+  clean() {
     this.combineResult = [];
     this.result = [];
     this.elements = {};
+    this.currentElementOrder = [];
+  },
+
+  checkOrder(element) {
+    const position = this.elementOrder.indexOf(element);
+    if (this.currentElementOrder[this.currentElementOrder.length - 1] > position) {
+      this.clean();
+      throw Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    } else {
+      this.currentElementOrder.push(position);
+    }
+  },
+
+  stringify() {
+    const resultEnd = this.result.join('');
+    this.clean();
     return resultEnd;
   },
 };
