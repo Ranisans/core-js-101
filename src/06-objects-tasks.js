@@ -113,32 +113,69 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  elements: {},
+  combineResult: [],
+  result: [],
+  element(value) {
+    if (this.result.length > 0) {
+      // if (this.result.length < 2) throw Error;
+      this.combineResult.push(this.result.join(''));
+      this.result = [];
+      this.elements = {};
+    }
+
+    this.result.push(value);
+    return this;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    // if (this.element.id) {
+    //   throw Error;
+    // }
+    // this.element.id = 1;
+    this.result.push(`#${value}`);
+    return this;
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    this.result.push(`.${value}`);
+    return this;
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    this.result.push(`[${value}]`);
+    return this;
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    this.element.psCls = 1;
+    this.result.push(`:${value}`);
+    return this;
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    // if (this.element.psEl) {
+    //   throw Error;
+    // }
+    // this.element.psEl = 1;
+    this.result.push(`::${value}`);
+    return this;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    const first = selector2.combineResult.pop();
+    const second = [...selector1.result].join('');
+    this.result = [];
+    this.result.push(`${first} ${combinator} ${second}`);
+    return this;
+  },
+
+  stringify() {
+    const resultEnd = this.result.join('');
+    this.combineResult = [];
+    this.result = [];
+    this.elements = {};
+    return resultEnd;
   },
 };
 
