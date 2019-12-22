@@ -271,8 +271,19 @@ function reverseInteger(num) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
+function isCreditCardNumber(ccn) {
+  const arr = ccn.toString(10).split('').map(Number);
+  let startPosition = 0;
+  if (arr.length % 2 !== 0) startPosition = 1;
+  const sum = arr.reduce((acc, el, i) => {
+    let value = el;
+    if (i % 2 === startPosition) {
+      value *= 2;
+      value = value > 9 ? value - 9 : value;
+    }
+    return acc + value;
+  }, 0);
+  return sum % 10 === 0;
 }
 
 /**
@@ -289,8 +300,11 @@ function isCreditCardNumber(/* ccn */) {
  *   10000 ( 1+0+0+0+0 = 1 ) => 1
  *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
  */
-function getDigitalRoot(/* num */) {
-  throw new Error('Not implemented');
+function getDigitalRoot(num) {
+  const arr = num.toString(10).split('').map(Number);
+  const sum = arr.reduce((acc, el) => acc + el, 0);
+  if (sum > 10) return getDigitalRoot(sum);
+  return sum;
 }
 
 
@@ -315,8 +329,21 @@ function getDigitalRoot(/* num */) {
  *   '{)' = false
  *   '{[(<{[]}>)]}' = true
  */
-function isBracketsBalanced(/* str */) {
-  throw new Error('Not implemented');
+function isBracketsBalanced(str) {
+  const result = [];
+  const brackets = { open: ['[', '<', '{', '('], close: [']', '>', '}', ')'] };
+  let error = false;
+  str.split('').forEach((el) => {
+    if (brackets.open.includes(el)) {
+      result.push(el);
+    } else {
+      const preEl = result.pop();
+      if (preEl === undefined
+        || brackets.open.indexOf(preEl) !== brackets.close.indexOf(el)) { error = true; }
+    }
+  });
+  if (error) return false;
+  return result.length === 0;
 }
 
 
