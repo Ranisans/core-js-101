@@ -476,8 +476,29 @@ function getMatrixProduct(m1, m2) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(position) {
+  const winPositions = [
+    [[[0], [0]], [[0], [1]], [[0], [2]]],
+    [[[1], [0]], [[1], [1]], [[1], [2]]],
+    [[[2], [0]], [[2], [1]], [[2], [2]]],
+    [[[0], [0]], [[1], [0]], [[2], [0]]],
+    [[[0], [1]], [[1], [1]], [[2], [1]]],
+    [[[0], [2]], [[1], [2]], [[2], [2]]],
+    [[[0], [0]], [[1], [1]], [[2], [2]]],
+    [[[2], [0]], [[1], [1]], [[0], [2]]],
+  ];
+
+  for (let i = 0; i < winPositions.length; i += 1) {
+    const winPosition = winPositions[i];
+    if (
+      position[winPosition[0][0]][winPosition[0][1]]
+      === position[winPosition[1][0]][winPosition[1][1]]
+      && position[winPosition[0][0]][winPosition[0][1]]
+      === position[winPosition[2][0]][winPosition[2][1]]
+      && position[winPosition[0][0]][winPosition[0][1]] !== undefined
+    ) return position[winPosition[0][0]][winPosition[0][1]];
+  }
+  return undefined;
 }
 
 
